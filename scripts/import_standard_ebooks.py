@@ -21,7 +21,7 @@ BASE_SE_URL = 'https://standardebooks.org'
 
 def get_feed():
     """Fetches and returns Standard Ebook's feed."""
-    r = requests.get(FEED_URL)
+    r = requests.get(FEED_URL, timeout=60)
     return feedparser.parse(r.text)
 
 
@@ -91,7 +91,7 @@ def find_last_updated() -> str | None:
     Returns None if the last modified date is not included in the
     response headers.
     """
-    r = requests.head(FEED_URL)
+    r = requests.head(FEED_URL, timeout=60)
     return r.headers['last-modified'] if r.ok else None
 
 

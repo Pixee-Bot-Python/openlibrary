@@ -44,15 +44,15 @@ def fetch_issues(updated_since: str):
         'per_page': 100,
     }
     response = requests.get(
-        'https://api.github.com/search/issues', params=p, headers=github_headers
-    )
+        'https://api.github.com/search/issues', params=p, headers=github_headers, 
+    timeout=60)
     d = response.json()
     results = d['items']
 
     # Fetch additional updated issues, if any exist
     def get_next_page(url: str):
         """Returns list of issues and optional url for next page"""
-        resp = requests.get(url, headers=github_headers)
+        resp = requests.get(url, headers=github_headers, timeout=60)
         # Get issues
         d = resp.json()
         issues = d['items']
@@ -84,8 +84,8 @@ def filter_issues(issues: list, since: datetime, leads: list[dict[str, str]]):
         # Fetch comments using URL from previous GitHub search results
         comments_url = i.get('comments_url')
         resp = requests.get(
-            comments_url, params={'per_page': 100}, headers=github_headers
-        )
+            comments_url, params={'per_page': 100}, headers=github_headers, 
+        timeout=60)
 
         # Ensure that we have the last page of comments
         links = resp.links
@@ -93,7 +93,7 @@ def filter_issues(issues: list, since: datetime, leads: list[dict[str, str]]):
         last_url = last.get('url', '')
 
         if last_url:
-            resp = requests.get(last_url, headers=github_headers)
+            resp = requests.get(last_url, headers=github_headers, timeout=60)
 
         # Get last comment
         comments = resp.json()
@@ -166,7 +166,7 @@ def publish_digest(
             'channel': slack_channel,
             'text': parent_thread_msg,
         },
-    )
+    timeout=60)
 
     if response.status_code != 200:
         # XXX : Log this
@@ -193,7 +193,7 @@ def publish_digest(
                 'text': message,
                 'thread_ts': ts,
             },
-        )
+        timeout=60)
         if response.status_code != 200:
             # XXX : Check "ok" field for errors
             # XXX : Log this
@@ -245,7 +245,7 @@ def add_label_to_issues(issues):
             issue_labels_url,
             json={"labels": ["Needs: Response"]},
             headers=github_headers,
-        )
+        timeout=60)
 
 
 def verbose_output(issues):
