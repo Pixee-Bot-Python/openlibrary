@@ -80,7 +80,7 @@ def get_last_updated_time() -> str | None:
     """
     if path.exists(LAST_UPDATED_TIME):
         with open(LAST_UPDATED_TIME) as f:
-            return f.readline()
+            return f.readline(5_000_000)
 
     return None
 
