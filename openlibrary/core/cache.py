@@ -1,7 +1,5 @@
 """Caching utilities.
 """
-
-import random
 import string
 import time
 import threading
@@ -20,6 +18,7 @@ from infogami.infobase.client import Nothing
 from openlibrary.utils import olmemcache
 from openlibrary.utils.dateutil import MINUTE_SECS
 from openlibrary.core.helpers import NothingEncoder
+import secrets
 
 
 __all__ = [
@@ -103,7 +102,7 @@ class memcache_memoize:
 
     def _random_string(self, n):
         chars = string.ascii_letters + string.digits
-        return "".join(random.choice(chars) for i in range(n))
+        return "".join(secrets.choice(chars) for i in range(n))
 
     def __call__(self, *args, **kw):
         """Memoized function call.

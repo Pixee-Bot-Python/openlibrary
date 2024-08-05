@@ -11,7 +11,6 @@ import babel.dates
 from babel.lists import format_list
 from collections import defaultdict
 import re
-import random
 import xml.etree.ElementTree as etree
 import datetime
 import logging
@@ -44,6 +43,7 @@ from openlibrary.core import cache
 
 from web.utils import Storage
 from web.template import TemplateResult
+import secrets
 
 if TYPE_CHECKING:
     from openlibrary.plugins.upstream.models import (
@@ -1398,7 +1398,7 @@ def get_random_recent_changes(n):
     else:
         changes = _get_recent_changes()
 
-    _changes = random.sample(changes, n) if len(changes) > n else changes
+    _changes = secrets.SystemRandom().sample(changes, n) if len(changes) > n else changes
     for i, change in enumerate(_changes):
         _changes[i]['__body__'] = (
             _changes[i]['__body__'].replace('<script>', '').replace('</script>', '')
