@@ -28,6 +28,7 @@ from openlibrary.config import load_config
 from openlibrary.core.imports import Batch, ImportItem
 from openlibrary.core.vendors import get_amazon_metadata
 from scripts.solr_builder.solr_builder.fn_to_cli import FnToCLI
+from security import safe_requests
 
 
 logger = logging.getLogger("openlibrary.importer.promises")
@@ -117,7 +118,7 @@ def stage_b_asins_for_import(olbooks: list[dict[str, Any]]) -> None:
 def batch_import(promise_id, batch_size=1000, dry_run=False):
     url = "https://archive.org/download/"
     date = promise_id.split("_")[-1]
-    resp = requests.get(f"{url}{promise_id}/DailyPallets__{date}.json", stream=True)
+    resp = safe_requests.get(f"{url}{promise_id}/DailyPallets__{date}.json", stream=True)
     olbooks_gen = (
         map_book_to_olbook(book, promise_id) for book in ijson.items(resp.raw, 'item')
     )
@@ -185,7 +186,7 @@ def main(ol_config: str, dates: str, dry_run: bool = False):
         start_date = end_date = dates
 
     url = get_promise_items_url(start_date, end_date)
-    r = requests.get(url)
+    r = safe_requests.get(url)
     identifiers = [d['identifier'] for d in r.json()['response']['docs']]
 
     if not identifiers:

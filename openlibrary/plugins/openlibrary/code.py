@@ -3,7 +3,6 @@ Open Library Plugin.
 """
 
 from urllib.parse import parse_qs, urlparse, urlencode, urlunparse
-import requests
 import web
 import json
 import os
@@ -17,6 +16,7 @@ import infogami
 from openlibrary.core.batch_imports import (
     batch_import,
 )
+from security import safe_requests
 
 # make sure infogami.config.features is set
 if not hasattr(infogami.config, 'features'):
@@ -422,7 +422,7 @@ class robotstxt(delegate.page):
 
 @web.memoize
 def fetch_ia_js(filename: str) -> str:
-    return requests.get(f'https://archive.org/includes/{filename}').text
+    return safe_requests.get(f'https://archive.org/includes/{filename}').text
 
 
 class ia_js_cdn(delegate.page):
@@ -927,7 +927,7 @@ def most_recent_change():
 def get_cover_id(key):
     try:
         _, cat, oln = key.split('/')
-        return requests.get(
+        return safe_requests.get(
             f"https://covers.openlibrary.org/{cat}/query?olid={oln}&limit=1"
         ).json()[0]
     except (IndexError, json.decoder.JSONDecodeError, TypeError, ValueError):

@@ -4,6 +4,7 @@ import logging
 import requests
 
 from openlibrary.core import lending
+from security import safe_requests
 
 CIVI_ISBN = 'custom_52'
 CIVI_USERNAME = 'custom_51'
@@ -29,7 +30,7 @@ def get_contact(username=None, contact_id=None):
         data["json"]["contact_id"] = contact_id
     data["json"] = json.dumps(data["json"])  # flatten the json field as a string
     try:
-        r = requests.get(
+        r = safe_requests.get(
             lending.config_ia_civicrm_api.get("url", ""),
             params=data,
             timeout=3,
@@ -80,7 +81,7 @@ def get_sponsorships_by_contact_id(contact_id=None, isbn=None):
     data["json"] = json.dumps(data["json"])  # flatten the json field as a string
     try:
         txs = (
-            requests.get(
+            safe_requests.get(
                 lending.config_ia_civicrm_api.get("url", ""),
                 timeout=3,
                 params=data,

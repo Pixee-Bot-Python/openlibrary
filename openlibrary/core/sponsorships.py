@@ -17,6 +17,7 @@ from openlibrary.core.civicrm import (
     get_sponsorship_by_isbn,
 )
 import internetarchive as ia
+from security import safe_requests
 
 try:
     from booklending_utils.sponsorship import eligibility_check, BLOCKED_PATRONS
@@ -75,7 +76,7 @@ def get_sponsored_editions(user, page: int = 1) -> list:
             },
             doseq=True,
         )
-        r = requests.get(f'{url}?{params}')
+        r = safe_requests.get(f'{url}?{params}')
         # e.g. [{'openlibrary_edition': 'OL24896084M', 'identifier': 'isbn_9780691160191'}]
         return r.json()['response'].get('docs')
     return []
@@ -100,7 +101,7 @@ def do_we_want_it(isbn: str) -> tuple[bool, list]:
     }
     url = '%s/book/marc/ol_dedupe.php' % lending.config_ia_domain
     try:
-        data = requests.get(url, params=params, timeout=2).json()
+        data = safe_requests.get(url, params=params, timeout=2).json()
         dwwi = data.get('response', 0)
         return dwwi == 1, data.get('books', [])
     except requests.exceptions.Timeout:
