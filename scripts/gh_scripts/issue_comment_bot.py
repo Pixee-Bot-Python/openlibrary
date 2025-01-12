@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import requests
+from security import safe_requests
 
 github_headers = {
     'X-GitHub-Api-Version': '2022-11-28',
@@ -43,7 +44,7 @@ def fetch_issues(updated_since: str):
         'q': query,
         'per_page': 100,
     }
-    response = requests.get(
+    response = safe_requests.get(
         'https://api.github.com/search/issues', params=p, headers=github_headers
     )
     d = response.json()
@@ -52,7 +53,7 @@ def fetch_issues(updated_since: str):
     # Fetch additional updated issues, if any exist
     def get_next_page(url: str):
         """Returns list of issues and optional url for next page"""
-        resp = requests.get(url, headers=github_headers)
+        resp = safe_requests.get(url, headers=github_headers)
         # Get issues
         d = resp.json()
         issues = d['items']
@@ -83,7 +84,7 @@ def filter_issues(issues: list, since: datetime, leads: list[dict[str, str]]):
     for i in issues:
         # Fetch comments using URL from previous GitHub search results
         comments_url = i.get('comments_url')
-        resp = requests.get(
+        resp = safe_requests.get(
             comments_url, params={'per_page': 100}, headers=github_headers
         )
 
@@ -93,7 +94,7 @@ def filter_issues(issues: list, since: datetime, leads: list[dict[str, str]]):
         last_url = last.get('url', '')
 
         if last_url:
-            resp = requests.get(last_url, headers=github_headers)
+            resp = safe_requests.get(last_url, headers=github_headers)
 
         # Get last comment
         comments = resp.json()
