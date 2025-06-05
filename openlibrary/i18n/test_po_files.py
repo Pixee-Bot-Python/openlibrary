@@ -5,6 +5,7 @@ from babel.messages.pofile import read_po
 import xml.etree.ElementTree as etree
 
 from openlibrary.i18n import get_locales
+import defusedxml.ElementTree
 
 root = os.path.dirname(__file__)
 # Fix these and then remove them from this list
@@ -86,7 +87,7 @@ def test_html_format(locale: str, msgid: str, msgstr: str):
     # Need this to support &nbsp;, since etree only parses XML.
     # Find a better solution?
     entities = '<!DOCTYPE text [ <!ENTITY nbsp "&#160;"> ]>'
-    id_tree = etree.fromstring(f'{entities}<root>{msgid}</root>')
-    str_tree = etree.fromstring(f'{entities}<root>{msgstr}</root>')
+    id_tree = defusedxml.ElementTree.fromstring(f'{entities}<root>{msgid}</root>')
+    str_tree = defusedxml.ElementTree.fromstring(f'{entities}<root>{msgstr}</root>')
     if not msgstr.startswith('<!-- i18n-lint no-tree-equal -->'):
         assert trees_equal(id_tree, str_tree)
